@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Bell, Bot, CreditCard, FileSearch, HelpCircle, Home, LogOut, Menu, Search, Shield, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { logoutUser } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -129,13 +130,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             
             {/* Mobile Sidebar Footer */}
             <div className="border-t p-4">
-              <Link
-                href="/auth/logout"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Link>
+            <Button 
+  onClick={logoutUser}
+  className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+>
+  <LogOut className="h-4 w-4" />
+  Sign Out
+</Button>
             </div>
           </SheetContent>
         </Sheet>
@@ -173,9 +174,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/auth/logout">Logout</Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={logoutUser}>
+  Logout
+</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -248,13 +249,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           {/* Sidebar Footer */}
           <div className="border-t p-4">
-            <Link
-              href="/auth/logout"
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Link>
+          <Button
+  onClick={logoutUser}
+  className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+>
+  <LogOut className="h-4 w-4" />
+  Sign Out
+</Button>
           </div>
         </aside>
         

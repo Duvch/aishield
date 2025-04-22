@@ -1,38 +1,147 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Shield } from "lucide-react"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { toast } from "@/components/ui/use-toast"
+import { loginUser, registerUser } from "@/lib/auth-client"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo') || '/dashboard'
+  
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    confirmPassword: ""
+  })
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false)
-      // In a real app, you would redirect to dashboard or handle errors
-    }, 1500)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    })
   }
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate signup process
-    setTimeout(() => {
+    
+    try {
+      console.log("Attempting login for:", formData.email)
+      const success = await loginUser(formData.email, formData.password)
+      
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Redirecting to dashboard..."
+        })
+        
+        // Force navigation
+        console.log("Login successful, redirecting to:", returnTo)
+        
+        // Force a hard navigation to ensure cookies are properly processed
+        window.location.href = returnTo;
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Please check your credentials and try again",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      toast({
+        title: "An error occurred",
+        description: error instanceof Error ? error.message : "Failed to login",
+        variant: "destructive"
+      })
+    } finally {
       setIsLoading(false)
-      // In a real app, you would redirect to dashboard or handle errors
-    }, 1500)
+    }
   }
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match",
+        variant: "destructive"
+      })
+      setIsLoading(false)
+      return
+    }
+    
+    try {
+      const success = await registerUser({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName
+      })
+      
+      if (success) {
+        toast({
+          title: "Account created successfully",
+          description: "Logging you in..."
+        })
+        
+        // Automatically log in the user after successful registration
+        const loginSuccess = await loginUser(formData.email, formData.password)
+        
+        if (loginSuccess) {
+          toast({
+            title: "Login successful",
+            description: "Redirecting to dashboard..."
+          })
+          
+          // Force navigation to dashboard
+          window.location.href = returnTo;
+        } else {
+          toast({
+            title: "Auto-login failed",
+            description: "Please log in with your new credentials",
+            variant: "destructive"
+          })
+          // Switch to login tab
+          document.getElementById("login-tab")?.click()
+        }
+      } else {
+        toast({
+          title: "Registration failed",
+          description: "Email might already be in use",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "An error occurred",
+        description: error instanceof Error ? error.message : "Failed to create account",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Add debug output
+  useEffect(() => {
+    console.log("Login page mounted, returnTo:", returnTo)
+  }, [returnTo])
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-gray-950 to-indigo-950">
@@ -49,7 +158,7 @@ export default function LoginPage() {
 
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-gray-900/50">
-              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger id="login-tab" value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
@@ -62,12 +171,14 @@ export default function LoginPage() {
                     placeholder="name@example.com"
                     required
                     className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link href="#" className="text-xs text-indigo-400 hover:text-indigo-300">
+                    <Link href="/auth/forgot-password" className="text-xs text-indigo-400 hover:text-indigo-300">
                       Forgot password?
                     </Link>
                   </div>
@@ -77,6 +188,8 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                    value={formData.password}
+                    onChange={handleChange}
                   />
                 </div>
                 <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
@@ -94,6 +207,8 @@ export default function LoginPage() {
                       placeholder="John"
                       required
                       className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                      value={formData.firstName}
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="space-y-2">
@@ -103,6 +218,8 @@ export default function LoginPage() {
                       placeholder="Doe"
                       required
                       className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                      value={formData.lastName}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -114,6 +231,8 @@ export default function LoginPage() {
                     placeholder="name@example.com"
                     required
                     className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
@@ -124,6 +243,8 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                    value={formData.password}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="space-y-2">
@@ -134,6 +255,8 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
                   />
                 </div>
                 <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
@@ -154,4 +277,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
