@@ -19,38 +19,163 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { Badge } from "@/components/ui/badge"
 
+// Define form state type
+interface ScanFormState {
+  contentType: "image" | "video" | "keywords";
+  url: string;
+  description?: string;
+  keywords?: string;
+  platforms: string[];
+  purposes: string[];
+  priority: "standard" | "priority";
+  imageFile?: File | null;
+}
+
 export default function RequestScanPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [contentType, setContentType] = useState("image")
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
-  const [scanPurposes, setScanPurposes] = useState<string[]>([])
-
-  const handleScanPurposeChange = (purpose: string) => {
-    setScanPurposes((prev) => {
-      if (prev.includes(purpose)) {
-        return prev.filter((p) => p !== purpose)
-      } else {
-        return [...prev, purpose]
-      }
-    })
+  const [formState, setFormState] = useState<ScanFormState>({
+    contentType: "image",
+    url: "",
+    description: "",
+    keywords: "",
+    platforms: [],
+    purposes: [],
+    priority: "standard",
+    imageFile: null
+  })
+  
+  // Helper function to update form state
+  const updateFormState = (key: keyof ScanFormState, value: any) => {
+    setFormState(prev => ({ ...prev, [key]: value }))
   }
+
+  // Handle platform selection
+  const handlePlatformChange = (platform: string, checked: boolean | string) => {
+    if (checked) {
+      updateFormState('platforms', [...formState.platforms, platform])
+    } else {
+      updateFormState('platforms', formState.platforms.filter(p => p !== platform))
+    }
+  }
+
+  // Handle scan purpose change
+  const handleScanPurposeChange = (purpose: string) => {
+    const newPurposes = formState.purposes.includes(purpose)
+      ? formState.purposes.filter(p => p !== purpose)
+      : [...formState.purposes, purpose]
+    
+    updateFormState('purposes', newPurposes)
+  }
+
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    updateFormState('imageFile', file)
+  }
+
+  // Prepare data for database
+  const prepareDataForSubmission = () => {
+    // Get the URL based on content type
+    let url = "";
+    
+    if (formState.contentType === "video") {
+      url = formState.url;
+    } else if (formState.contentType === "image") {
+      // For image uploads, we'd typically upload to a storage service
+      // and store the resulting URL, but for now we'll use a placeholder
+      url = formState.imageFile ? `image:${formState.imageFile.name}` : "";
+    } else if (formState.contentType === "keywords") {
+      url = `keywords:${formState.keywords}`;
+    }
+    
+    // Return formatted data matching the schema
+    return {
+      url: url,
+      contentType: formState.contentType,
+      description: formState.description,
+      platforms: formState.platforms,
+      purposes: formState.purposes,
+      priority: formState.priority,
+      status: "pending"
+    };
+  };
+
+  // Updated handleSubmit function for your RequestScanPage component
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    toast({
-      title: "Scan Request Submitted",
-      description: "Your scan request has been sent to the admin for approval.",
-    })
-
-    setIsSubmitting(false)
-    router.push("/dashboard")
-  }
+    e.preventDefault();
+    setIsSubmitting(true);
+  
+    try {
+      // 1. Handle image upload if there's an image file
+      let imageUrl = "";
+      if (formState.contentType === "image" && formState.imageFile) {
+        // Create a FormData object to upload the file
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', formState.imageFile);
+        
+        // Upload image to your file storage API
+        const uploadResponse = await fetch('/api/uploads', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload image');
+        }
+        
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.url; // Get the URL of the uploaded file
+      }
+  
+      // 2. Prepare the data for submission
+      const scanRequestData = {
+        contentType: formState.contentType,
+        // Set the URL based on content type
+        url: formState.contentType === "image" 
+             ? imageUrl 
+             : formState.contentType === "keywords" 
+               ? `keywords:${formState.keywords}` // Create a special URL format for keywords
+               : formState.url,
+        description: formState.description || "",
+        keywords: formState.keywords || "",
+        platforms: formState.platforms,
+        purposes: formState.purposes,
+        priority: formState.priority,
+      };
+      
+      // 3. Submit the data to your API
+      const response = await fetch('/api/scan-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scanRequestData),
+        credentials: 'include', // Important for sending cookies
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to submit scan request');
+      }
+  
+      toast({
+        title: "Scan Request Submitted",
+        description: "Your scan request has been sent for processing.",
+      });
+  
+      router.push("/dashboard");
+    } catch (error) {
+      console.error('Error submitting scan request:', error);
+      toast({
+        title: "Submission Error",
+        description: "There was a problem submitting your scan request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -69,7 +194,11 @@ export default function RequestScanPage() {
             {/* Content Type Selection */}
             <div className="space-y-4">
               <Label>Content Type</Label>
-              <Tabs defaultValue="image" onValueChange={setContentType} className="w-full">
+              <Tabs 
+                defaultValue="image" 
+                onValueChange={(value) => updateFormState('contentType', value as "image" | "video" | "keywords")} 
+                className="w-full"
+              >
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="image">Image</TabsTrigger>
                   <TabsTrigger value="video">Video Link</TabsTrigger>
@@ -85,7 +214,13 @@ export default function RequestScanPage() {
                         <p className="text-sm font-medium">Drag & drop or click to upload</p>
                         <p className="text-xs text-muted-foreground">Supports JPG, PNG, WEBP (max 10MB)</p>
                       </div>
-                      <Input type="file" className="hidden" id="image-upload" accept="image/*" />
+                      <Input 
+                        type="file" 
+                        className="hidden" 
+                        id="image-upload" 
+                        accept="image/*" 
+                        onChange={handleFileChange}
+                      />
                       <Button
                         type="button"
                         variant="outline"
@@ -94,6 +229,11 @@ export default function RequestScanPage() {
                       >
                         Select Image
                       </Button>
+                      {formState.imageFile && (
+                        <div className="text-sm mt-2">
+                          Selected file: {formState.imageFile.name}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -102,13 +242,20 @@ export default function RequestScanPage() {
                       id="image-description"
                       placeholder="Describe your image to improve scan accuracy"
                       className="mt-1.5"
+                      value={formState.description || ""}
+                      onChange={(e) => updateFormState('description', e.target.value)}
                     />
                   </div>
                 </TabsContent>
                 <TabsContent value="video" className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="video-url">Video URL</Label>
-                    <Input id="video-url" placeholder="https://youtube.com/watch?v=..." />
+                    <Input 
+                      id="video-url" 
+                      placeholder="https://youtube.com/watch?v=..." 
+                      value={formState.url}
+                      onChange={(e) => updateFormState('url', e.target.value)}
+                    />
                     <p className="text-xs text-muted-foreground">
                       Enter a YouTube, TikTok, Instagram, or other video platform URL
                     </p>
@@ -119,13 +266,20 @@ export default function RequestScanPage() {
                       id="video-description"
                       placeholder="Describe your video to improve scan accuracy"
                       className="mt-1.5"
+                      value={formState.description || ""}
+                      onChange={(e) => updateFormState('description', e.target.value)}
                     />
                   </div>
                 </TabsContent>
                 <TabsContent value="keywords" className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="keywords">Keywords</Label>
-                    <Textarea id="keywords" placeholder="Enter keywords separated by commas" />
+                    <Textarea 
+                      id="keywords" 
+                      placeholder="Enter keywords separated by commas"
+                      value={formState.keywords || ""}
+                      onChange={(e) => updateFormState('keywords', e.target.value)}
+                    />
                     <p className="text-xs text-muted-foreground">
                       Enter keywords related to your content (e.g., your name, brand, product names)
                     </p>
@@ -143,12 +297,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="youtube"
-                    checked={selectedPlatforms.includes("youtube")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "youtube"] : prev.filter((p) => p !== "youtube"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("youtube")}
+                    onCheckedChange={(checked) => handlePlatformChange("youtube", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="youtube" className="cursor-pointer font-medium">
@@ -159,12 +309,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="instagram"
-                    checked={selectedPlatforms.includes("instagram")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "instagram"] : prev.filter((p) => p !== "instagram"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("instagram")}
+                    onCheckedChange={(checked) => handlePlatformChange("instagram", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="instagram" className="cursor-pointer font-medium">
@@ -175,12 +321,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="facebook"
-                    checked={selectedPlatforms.includes("facebook")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "facebook"] : prev.filter((p) => p !== "facebook"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("facebook")}
+                    onCheckedChange={(checked) => handlePlatformChange("facebook", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="facebook" className="cursor-pointer font-medium">
@@ -191,12 +333,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="tiktok"
-                    checked={selectedPlatforms.includes("tiktok")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "tiktok"] : prev.filter((p) => p !== "tiktok"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("tiktok")}
+                    onCheckedChange={(checked) => handlePlatformChange("tiktok", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="tiktok" className="cursor-pointer font-medium">
@@ -207,12 +345,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="twitter"
-                    checked={selectedPlatforms.includes("twitter")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "twitter"] : prev.filter((p) => p !== "twitter"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("twitter")}
+                    onCheckedChange={(checked) => handlePlatformChange("twitter", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="twitter" className="cursor-pointer font-medium">
@@ -223,12 +357,8 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="reddit"
-                    checked={selectedPlatforms.includes("reddit")}
-                    onCheckedChange={(checked) => {
-                      setSelectedPlatforms((prev) =>
-                        checked ? [...prev, "reddit"] : prev.filter((p) => p !== "reddit"),
-                      )
-                    }}
+                    checked={formState.platforms.includes("reddit")}
+                    onCheckedChange={(checked) => handlePlatformChange("reddit", checked)}
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="reddit" className="cursor-pointer font-medium">
@@ -237,20 +367,20 @@ export default function RequestScanPage() {
                   </div>
                 </div>
               </div>
-              {selectedPlatforms.length === 0 && (
+              {formState.platforms.length === 0 && (
                 <p className="text-sm text-muted-foreground">Please select at least one platform to scan</p>
               )}
-              {selectedPlatforms.length > 0 && (
+              {formState.platforms.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   <p className="text-sm text-muted-foreground mr-2">Selected platforms:</p>
-                  {selectedPlatforms.map((platform) => (
+                  {formState.platforms.map((platform) => (
                     <Badge key={platform} variant="secondary" className="flex items-center gap-1">
                       {platform.charAt(0).toUpperCase() + platform.slice(1)}
                       <Button
                         variant="ghost"
                         size="sm"
                         className="h-4 w-4 p-0 hover:bg-transparent"
-                        onClick={() => setSelectedPlatforms((prev) => prev.filter((p) => p !== platform))}
+                        onClick={() => handlePlatformChange(platform, false)}
                       >
                         <X className="h-3 w-3" />
                         <span className="sr-only">Remove {platform}</span>
@@ -270,7 +400,7 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="deepfakes"
-                    checked={scanPurposes.includes("deepfakes")}
+                    checked={formState.purposes.includes("deepfakes")}
                     onCheckedChange={() => handleScanPurposeChange("deepfakes")}
                   />
                   <div className="space-y-1 leading-none">
@@ -283,7 +413,7 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="copyright"
-                    checked={scanPurposes.includes("copyright")}
+                    checked={formState.purposes.includes("copyright")}
                     onCheckedChange={() => handleScanPurposeChange("copyright")}
                   />
                   <div className="space-y-1 leading-none">
@@ -296,7 +426,7 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="ai-generated"
-                    checked={scanPurposes.includes("ai-generated")}
+                    checked={formState.purposes.includes("ai-generated")}
                     onCheckedChange={() => handleScanPurposeChange("ai-generated")}
                   />
                   <div className="space-y-1 leading-none">
@@ -309,7 +439,7 @@ export default function RequestScanPage() {
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
                     id="brand-usage"
-                    checked={scanPurposes.includes("brand-usage")}
+                    checked={formState.purposes.includes("brand-usage")}
                     onCheckedChange={() => handleScanPurposeChange("brand-usage")}
                   />
                   <div className="space-y-1 leading-none">
@@ -329,7 +459,11 @@ export default function RequestScanPage() {
             {/* Scan Priority */}
             <div className="space-y-4">
               <Label>Scan Priority</Label>
-              <RadioGroup defaultValue="standard">
+              <RadioGroup 
+                defaultValue="standard" 
+                value={formState.priority}
+                onValueChange={(value) => updateFormState('priority', value as "standard" | "priority")}
+              >
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <RadioGroupItem value="standard" id="standard" />
                   <div className="space-y-1 leading-none">
@@ -356,7 +490,15 @@ export default function RequestScanPage() {
               <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
               <span className="text-sm">Expected scan time: 15-30 minutes after approval</span>
             </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isSubmitting || formState.platforms.length === 0 || 
+                (formState.contentType === "video" && !formState.url) ||
+                (formState.contentType === "keywords" && !formState.keywords) ||
+                (formState.contentType === "image" && !formState.imageFile)
+              }
+            >
               {isSubmitting ? (
                 <>
                   <motion.div
@@ -376,4 +518,3 @@ export default function RequestScanPage() {
     </div>
   )
 }
-

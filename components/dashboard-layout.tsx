@@ -1,9 +1,8 @@
-
 "use client"
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
@@ -24,13 +23,19 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-// Mock user data
-const user = {
-  name: "John Doe",
-  email: "john@example.com",
-  avatar: "/placeholder.svg?height=40&width=40",
-  plan: "Pro",
-}
+// Define the user type based on your schema
+type User = {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  plan: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 
 // Navigation items
 const navItems = [
@@ -46,7 +51,40 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  console.log("User:", user)
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch('/api/user')
+        if (!res.ok) throw new Error('Failed to fetch user data')
+        const data = await res.json()
+        setUser(data) // Assuming we're using the first user from the returned array
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUser()
+  }, [])
+
+  // Show loading state or fallback while fetching user data
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center">Loading...</div>
+  }
+
+  // Safety check - if no user is found after loading
+  if (!user) {
+    return <div className="flex min-h-screen items-center justify-center">User not found</div>
+  }
+
+  // Combine first and last name for display
+  const fullName = `${user.firstName} ${user.lastName}`
+  
   return (
     <div className="flex min-h-screen flex-col">
       {/* Mobile Header */}
@@ -73,16 +111,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            
+
             {/* Mobile Sidebar User */}
             <div className="border-b px-6 py-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 border-2 border-primary/10">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="bg-primary/10 text-primary">{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={user.avatar} alt={fullName} />
+                  <AvatarFallback className="bg-primary/10 text-primary">{fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="font-medium">{user.name}</span>
+                  <span className="font-medium">{fullName}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">{user.email}</span>
                     <Badge variant="outline" className="border-primary/30 text-xs bg-primary/5 text-primary font-normal">
@@ -92,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               </div>
             </div>
-            
+
             {/* Mobile Navigation */}
             <nav className="flex-1 overflow-auto py-4">
               <div className="px-3 mb-2">
@@ -112,8 +150,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       onClick={() => setIsSidebarOpen(false)}
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
-                        pathname === item.href 
-                          ? "bg-primary text-primary-foreground" 
+                        pathname === item.href
+                          ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
@@ -127,16 +165,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 })}
               </div>
             </nav>
-            
+
             {/* Mobile Sidebar Footer */}
             <div className="border-t p-4">
-            <Button 
-  onClick={logoutUser}
-  className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
->
-  <LogOut className="h-4 w-4" />
-  Sign Out
-</Button>
+              <Button
+                onClick={logoutUser}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </SheetContent>
         </Sheet>
@@ -164,8 +202,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={user.avatar} alt={fullName} />
+                  <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -175,8 +213,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem onClick={logoutUser}>
-  Logout
-</DropdownMenuItem>
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -191,9 +229,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="text-lg">AI Shield</span>
             </Link>
           </div>
-          
-         
-          
+
           {/* Navigation */}
           <nav className="flex-1 overflow-auto py-4">
             <div className="px-3 mb-2">
@@ -212,8 +248,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     href={item.href}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
-                      pathname === item.href 
-                        ? "bg-primary text-primary-foreground" 
+                      pathname === item.href
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
@@ -227,15 +263,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </div>
           </nav>
-           {/* User Profile Section */}
-           <div className="border-b px-6 py-4">
+          
+          {/* User Profile Section */}
+          <div className="border-t px-6 py-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 border-2 border-primary/10">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary/10 text-primary">{user.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.avatar} alt={fullName} />
+                <AvatarFallback className="bg-primary/10 text-primary">{fullName.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="font-medium">{user.name}</span>
+                <span className="font-medium">{fullName}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{user.email}</span>
                   <Badge variant="outline" className="border-primary/30 text-xs bg-primary/5 text-primary font-normal">
@@ -245,20 +282,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
           </div>
-          
-          
+
           {/* Sidebar Footer */}
           <div className="border-t p-4">
-          <Button
-  onClick={logoutUser}
-  className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
->
-  <LogOut className="h-4 w-4" />
-  Sign Out
-</Button>
+            <Button
+              onClick={logoutUser}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-muted/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
           </div>
         </aside>
-        
+
         {/* Main content */}
         <main className="flex-1">
           <AnimatePresence mode="wait">
@@ -274,8 +310,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </motion.div>
           </AnimatePresence>
         </main>
-
-        
       </div>
     </div>
   )

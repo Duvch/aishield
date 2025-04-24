@@ -28,14 +28,39 @@ export const sessions = pgTable('sessions', {
 });
 
 // Scan requests table
+// export const scanRequests = pgTable('scan_requests', {
+//   id: serial('id').primaryKey(),
+//   userId: serial('user_id').references(() => users.id).notNull(),
+//   url: text('url').notNull(),
+//   status: varchar('status', { length: 50 }).default('pending').notNull(),
+//   createdAt: timestamp('created_at').defaultNow().notNull(),
+//   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+//   completedAt: timestamp('completed_at'),
+// });
+
+// Scan results table
+// export const scanResults = pgTable('scan_results', {
+//   id: serial('id').primaryKey(),
+//   scanRequestId: serial('scan_request_id').references(() => scanRequests.id).notNull(),
+//   result: text('result').notNull(),
+//   score: varchar('score', { length: 20 }),
+//   detectionType: varchar('detection_type', { length: 100 }),
+//   createdAt: timestamp('created_at').defaultNow().notNull(),
+// });
+
+// Scan requests table
 export const scanRequests = pgTable('scan_requests', {
   id: serial('id').primaryKey(),
   userId: serial('user_id').references(() => users.id).notNull(),
   url: text('url').notNull(),
-  status: varchar('status', { length: 50 }).default('pending').notNull(),
+  contentType: varchar('content_type', { length: 20 }).notNull(),
+  description: text('description'),
+  platforms: text('platforms').notNull(),
+  purposes: text('purposes').notNull(),
+  priority: varchar('priority', { length: 20 }).notNull(),
+  status: varchar('status', { length: 20 }).notNull().default('pending'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  completedAt: timestamp('completed_at'),
 });
 
 // Scan results table
@@ -45,6 +70,8 @@ export const scanResults = pgTable('scan_results', {
   result: text('result').notNull(),
   score: varchar('score', { length: 20 }),
   detectionType: varchar('detection_type', { length: 100 }),
+  platform: varchar('platform', { length: 50 }),
+  sourceUrl: text('source_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
