@@ -72,6 +72,8 @@ export const scanResults = pgTable('scan_results', {
   detectionType: varchar('detection_type', { length: 100 }),
   platform: varchar('platform', { length: 50 }),
   sourceUrl: text('source_url'),
+  mutlipleSources:text('multiple_sources').array(),
+  imageUrl:text('image_url').array(), 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -83,6 +85,12 @@ export const takedownRequests = pgTable('takedown_requests', {
   url: text('url').notNull(),
   status: varchar('status', { length: 50 }).default('pending').notNull(),
   notes: text('notes'),
+  userEmail: varchar('user_email', { length: 255 }).notNull(),
+  platform: varchar('platform', { length: 100 }).notNull(),
+  violation: text('violation').notNull(),
+  evidence: text('evidence'),
+  approvedBy: serial('approved_by').references(() => users.id),
+  dmcaReference: varchar('dmca_reference', { length: 100 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   completedAt: timestamp('completed_at'),

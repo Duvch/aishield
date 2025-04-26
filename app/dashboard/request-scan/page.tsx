@@ -200,8 +200,8 @@ export default function RequestScanPage() {
                 className="w-full"
               >
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="image">Image</TabsTrigger>
-                  <TabsTrigger value="video">Video Link</TabsTrigger>
+                  <TabsTrigger value="image">Image (Upcoming)</TabsTrigger>
+                  <TabsTrigger value="video">Video Link (Upcoming)</TabsTrigger>
                   <TabsTrigger value="keywords">Keywords</TabsTrigger>
                 </TabsList>
                 <TabsContent value="image" className="space-y-4 pt-4">
@@ -257,7 +257,7 @@ export default function RequestScanPage() {
                       onChange={(e) => updateFormState('url', e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Enter a YouTube, TikTok, Instagram, or other video platform URL
+                      Enter a YouTube, Linkedin, Instagram, or other video platform URL
                     </p>
                   </div>
                   <div>
@@ -332,13 +332,13 @@ export default function RequestScanPage() {
                 </div>
                 <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4">
                   <Checkbox
-                    id="tiktok"
-                    checked={formState.platforms.includes("tiktok")}
-                    onCheckedChange={(checked) => handlePlatformChange("tiktok", checked)}
+                    id="Linkedin"
+                    checked={formState.platforms.includes("Linkedin")}
+                    onCheckedChange={(checked) => handlePlatformChange("Linkedin", checked)}
                   />
                   <div className="space-y-1 leading-none">
-                    <Label htmlFor="tiktok" className="cursor-pointer font-medium">
-                      TikTok
+                    <Label htmlFor="Linkedin" className="cursor-pointer font-medium">
+                      Linkedin
                     </Label>
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function RequestScanPage() {
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="deepfakes" className="cursor-pointer font-medium">
-                      Search for Deepfakes
+                      Search for Deepfakes (Upcoming)
                     </Label>
                     <p className="text-xs text-muted-foreground">Find AI-generated content using your likeness</p>
                   </div>
@@ -431,7 +431,7 @@ export default function RequestScanPage() {
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="ai-generated" className="cursor-pointer font-medium">
-                      Track AI-generated Images
+                      Track AI-generated Images (Upcoming)
                     </Label>
                     <p className="text-xs text-muted-foreground">Find AI-generated content based on your work</p>
                   </div>
