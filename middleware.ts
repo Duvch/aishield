@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
   
   // If trying to access protected route without auth
   if (protectedPaths.some(path => pathname.startsWith(path)) && !isAuthenticated) {
-    const url = new URL('/login', request.url);
+    const url = new URL('/login-admin-control', request.url);
     url.searchParams.set('returnTo', pathname);
     return NextResponse.redirect(url);
   }
