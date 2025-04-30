@@ -6,10 +6,10 @@ import type { NextRequest } from 'next/server';
 const protectedPaths = ['/dashboard'];
 
 // Define which paths should remain accessible without auth
-const publicPaths = ['/', '/login', '/register'];
+const publicPaths = ['/', '/login-admin-control', '/register'];
 
 // API paths that should bypass middleware
-const apiPaths = ['/api/auth/login', '/api/auth/register', '/api/auth/logout'];
+const apiPaths = ['/api/auth/login-admin-control', '/api/auth/register', '/api/auth/logout'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

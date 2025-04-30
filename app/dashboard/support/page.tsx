@@ -84,9 +84,9 @@ const supportTickets = [
 // Mock data for FAQs
 const faqs = [
   {
-    question: "How does AI Shield detect deepfakes?",
+    question: "How does AI Cover detect deepfakes?",
     answer:
-      "AI Shield uses advanced machine learning algorithms to analyze visual and audio patterns in content across platforms. Our technology can detect manipulated media by identifying inconsistencies and artifacts that are typically present in AI-generated or manipulated content.",
+      "AI Cover uses advanced machine learning algorithms to analyze visual and audio patterns in content across platforms. Our technology can detect manipulated media by identifying inconsistencies and artifacts that are typically present in AI-generated or manipulated content.",
   },
   {
     question: "What happens after I request a takedown?",
@@ -99,7 +99,7 @@ const faqs = [
       "The AI Bot can be configured to scan daily, weekly, or monthly, depending on your preference. Pro users can set specific times for these scans to occur. Each scan covers all the platforms you've selected in your settings.",
   },
   {
-    question: "Can I use AI Shield for multiple people or brands?",
+    question: "Can I use AI Cover for multiple people or brands?",
     answer:
       "Yes, you can protect multiple identities or brands with a single account. Simply create different scan profiles for each person or brand you want to protect. Premium and Pro plans allow for more profiles than the Demo plan.",
   },
@@ -418,7 +418,7 @@ export default function SupportPage() {
           <Card>
             <CardHeader>
               <CardTitle>Frequently Asked Questions</CardTitle>
-              <CardDescription>Find answers to common questions about AI Shield</CardDescription>
+              <CardDescription>Find answers to common questions about AI Cover</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {faqs.map((faq, index) => (

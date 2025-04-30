@@ -36,7 +36,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
           <Shield className="h-8 w-8 text-indigo-500" />
-          <span className="text-xl font-bold text-white">AI Shield</span>
+          <span className="text-xl font-bold text-white">AI Cover</span>
         </Link>
 
         <nav className="hidden md:flex md:items-center md:space-x-6">
@@ -88,14 +88,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:block">
-          <Link href="/login">
-            <Button
-              variant="outline"
-              className="border-indigo-500/30 bg-indigo-950/30 text-indigo-200 backdrop-blur-sm hover:bg-indigo-900/40"
-            >
-              Login
-            </Button>
-          </Link>
+          
         </div>
 
         <button className="block md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -158,11 +151,7 @@ export function Navbar() {
               Contact
             </Link>
             <div className="mt-4">
-              <Link href="/login" className="w-full">
-                <Button className="w-full" variant="outline">
-                  Login
-                </Button>
-              </Link>
+              
             </div>
           </nav>
         </div>

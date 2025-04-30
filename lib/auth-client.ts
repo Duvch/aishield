@@ -3,7 +3,7 @@
 export async function loginUser(email: string, password: string): Promise<boolean> {
   try {
     // Make sure we're calling the correct endpoint
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch('/api/auth/login-admin-control', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export async function logoutUser(): Promise<boolean> {
     }
     
     // After successful logout, redirect to the home or login page
-    window.location.href = '/login';
+    window.location.href = '/login-admin-control';
     return true;
   } catch (error) {
     console.error('Error logging out:', error);

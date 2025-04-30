@@ -22,7 +22,7 @@ export default function FeaturesPage() {
               </Link>
               <h1 className="mb-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">Features</h1>
               <p className="max-w-2xl text-gray-400">
-                AI Shield offers comprehensive protection for your digital identity and content across the internet.
+                AI Cover offers comprehensive protection for your digital identity and content across the internet.
                 Explore our powerful features designed to keep your content safe.
               </p>
             </div>

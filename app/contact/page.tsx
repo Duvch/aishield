@@ -43,7 +43,7 @@ export default function ContactPage() {
               </Link>
               <h1 className="mb-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">Contact Us</h1>
               <p className="max-w-2xl text-gray-400">
-                Get in touch with our team to learn more about AI Shield and how we can help protect your digital
+                Get in touch with our team to learn more about AI Cover and how we can help protect your digital
                 content.
               </p>
               <Button className={`mt-5 px-6 py-3 transition-all ${glow ? "button-glow" : ""}`}>
@@ -159,7 +159,7 @@ export default function ContactPage() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-medium text-white">Email</h3>
-                      <p className="text-indigo-400">contact@aishield.ai</p>
+                      <p className="text-indigo-400">contact@aicover.ai</p>
                     </div>
                     <div>
                       <h3 className="text-lg font-medium text-white">Phone</h3>

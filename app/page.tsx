@@ -24,7 +24,7 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-6">
                 <AnimatedHeading />
                 <p className="max-w-md text-lg text-gray-300">
-                  AI Shield scans the internet to detect deepfakes, copyright violations, and unauthorized uses of your
+                  AI Cover scans the internet to detect deepfakes, copyright violations, and unauthorized uses of your
                   content across social media, ads, and websites.
                 </p>
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
@@ -57,7 +57,7 @@ export default function Home() {
                         <div className="h-3 w-3 rounded-full bg-red-500" />
                         <div className="h-3 w-3 rounded-full bg-yellow-500" />
                         <div className="h-3 w-3 rounded-full bg-green-500" />
-                        <div className="ml-4 text-xs font-medium text-gray-400">AI Shield Control Center</div>
+                        <div className="ml-4 text-xs font-medium text-gray-400">AI Cover Control Center</div>
                       </div>
                       <div className="flex-1 space-y-4 overflow-hidden rounded-md bg-gray-950/70 p-4">
                         <div className="h-6 w-2/3 rounded bg-indigo-900/40" />
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="mx-auto max-w-6xl">
             <div className="mb-16 text-center">
               <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                What AI Shield Can Do for You
+                What AI Cover Can Do for You
               </h2>
               <p className="mx-auto max-w-2xl text-gray-400">
                 Comprehensive protection for your digital identity and content across the internet
@@ -276,7 +276,7 @@ export default function Home() {
                     Ready to protect your digital identity?
                   </h2>
                   <p className="mx-auto mb-8 max-w-2xl text-lg text-indigo-100">
-                    Get started today and let AI Shield guard your content across the internet.
+                    Get started today and let AI Cover guard your content across the internet.
                   </p>
                   <Link href="/contact">
                     <Button size="lg" className="bg-white text-indigo-900 hover:bg-gray-100">

@@ -11,7 +11,7 @@ export default function LogoutPage() {
   useEffect(() => {
     async function performLogout() {
       await logoutUser()
-      router.push("/login")
+      router.push("/login-admin-control")
     }
     
     performLogout()
