@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { ArrowLeft, Shield } from "lucide-react"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,11 +13,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "@/components/ui/use-toast"
 import { loginUser, registerUser } from "@/lib/auth-client"
 
-export default function LoginPage() {
+// Create a client component that uses searchParams
+function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const returnTo = searchParams.get('returnTo') || '/dashboard'
+  
+  // Get return URL from the URL safely on the client side
+  const [returnTo, setReturnTo] = useState('/dashboard')
+  
+  useEffect(() => {
+    // Safely get the searchParams on the client side
+    const params = new URLSearchParams(window.location.search)
+    const returnParam = params.get('returnTo')
+    if (returnParam) {
+      setReturnTo(returnParam)
+    }
+    console.log("Login page mounted, returnTo:", returnParam || '/dashboard')
+  }, [])
   
   const [formData, setFormData] = useState({
     email: "",
@@ -137,11 +149,6 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
-
-  // Add debug output
-  useEffect(() => {
-    console.log("Login page mounted, returnTo:", returnTo)
-  }, [returnTo])
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-gray-950 to-indigo-950">
@@ -275,5 +282,20 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Main component with Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-950 to-indigo-950">
+        <div className="text-center text-white">
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
