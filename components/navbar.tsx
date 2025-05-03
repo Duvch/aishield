@@ -36,7 +36,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
           <Shield className="h-8 w-8 text-indigo-500" />
-          <span className="text-xl font-bold text-white">AI Cover</span>
+          <span className="text-xl font-bold text-white">AI Shield</span>
         </Link>
 
         <nav className="hidden md:flex md:items-center md:space-x-6">

@@ -22,7 +22,7 @@ export default function ProductPage() {
               </Link>
               <h1 className="mb-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">Product</h1>
               <p className="max-w-2xl text-gray-400">
-                Take a look at our powerful dashboard that puts protection in your hands. AI Cover's intuitive
+                Take a look at our powerful dashboard that puts protection in your hands. AI Shield's intuitive
                 interface makes it easy to monitor and protect your content.
               </p>
             </div>
@@ -78,7 +78,7 @@ export default function ProductPage() {
                 <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
                   <h3 className="mb-4 text-xl font-medium text-white">API Access</h3>
                   <p className="mb-4 text-gray-400">
-                    Integrate AI Cover directly into your existing workflows with our comprehensive API. Access all
+                    Integrate AI Shield directly into your existing workflows with our comprehensive API. Access all
                     features programmatically and receive alerts through your preferred channels.
                   </p>
                   <div className="rounded bg-gray-800 p-4">

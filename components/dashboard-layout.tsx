@@ -105,7 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => setIsSidebarOpen(false)}
               >
                 <Shield className="h-6 w-6 text-primary" />
-                <span className="text-lg">AI Cover</span>
+                <span className="text-lg">AI Shield</span>
               </Link>
               <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setIsSidebarOpen(false)}>
                 <X className="h-5 w-5" />
@@ -180,7 +180,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </Sheet>
         <Link href="/dashboard" className="flex items-center gap-2 font-bold">
           <Shield className="h-5 w-5" />
-          <span>AI Cover</span>
+          <span>AI Shield</span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <DropdownMenu>
@@ -226,7 +226,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/dashboard" className="flex items-center gap-2 font-bold">
               <Shield className="h-6 w-6 text-primary" />
-              <span className="text-lg">AI Cover</span>
+              <span className="text-lg">AI Shield</span>
             </Link>
           </div>
 

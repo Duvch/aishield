@@ -150,7 +150,7 @@ export default function LoginPage() {
           <div className="text-center">
             <Link href="/" className="inline-flex items-center justify-center">
               <Shield className="h-10 w-10 text-indigo-500" />
-              <span className="ml-2 text-2xl font-bold text-white">AI Cover</span>
+              <span className="ml-2 text-2xl font-bold text-white">AI Shield</span>
             </Link>
             <h1 className="mt-6 text-3xl font-bold text-white">Welcome Back</h1>
             <p className="mt-2 text-gray-400">Sign in to your account to continue</p>

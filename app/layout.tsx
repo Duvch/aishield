@@ -6,9 +6,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "AI Cover - Protect What You Create",
+  title: "AI Shield - Protect What You Create",
   description:
-    "AI Cover scans the internet to detect deepfakes, copyright violations, and unauthorized uses of your content across social media, ads, and websites.",
+    "AI Shield scans the internet to detect deepfakes, copyright violations, and unauthorized uses of your content across social media, ads, and websites.",
     generator: 'v0.dev'
 }
 

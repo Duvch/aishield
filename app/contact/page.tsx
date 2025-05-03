@@ -2,10 +2,10 @@
 
 import type React from "react"
 
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Check } from "lucide-react"
 import Link from "next/link"
-
+import 'dotenv/config';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -15,6 +15,7 @@ import { Footer } from "@/components/footer"
 
 export default function ContactPage() {
   const [glow, setGlow] = useState(true);
+  const [selectedInterest, setSelectedInterest] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => setGlow(false), 3000); // glow lasts 3 seconds
@@ -22,9 +23,18 @@ export default function ContactPage() {
   }, []);
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
     // In a real application, you would handle the form submission here
+    const response = await fetch(`https://formspree.io/f/${process.env.NEXT_PUBLIC_FORMID}`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
+    });
     setIsSubmitted(true)
   }
 
@@ -43,12 +53,12 @@ export default function ContactPage() {
               </Link>
               <h1 className="mb-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">Contact Us</h1>
               <p className="max-w-2xl text-gray-400">
-                Get in touch with our team to learn more about AI Cover and how we can help protect your digital
+                Get in touch with our team to learn more about AI Shield and how we can help protect your digital
                 content.
               </p>
               <Button className={`mt-5 px-6 py-3 transition-all ${glow ? "button-glow" : ""}`}>
-      Book a Demo
-    </Button>
+                Book a Demo
+              </Button>
             </div>
             <div className="mb-2 block text-lg font-medium text-gray-300">
               **Note: If you didn't see your meet time in book a demo page pls consider reaching out to us via below mentioning your time or sending candley or cal link**
@@ -79,6 +89,7 @@ export default function ContactPage() {
                         </label>
                         <Input
                           id="firstName"
+                          name="firstName"
                           placeholder="John"
                           required
                           className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
@@ -90,6 +101,7 @@ export default function ContactPage() {
                         </label>
                         <Input
                           id="lastName"
+                          name="lastName"
                           placeholder="Doe"
                           required
                           className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
@@ -102,6 +114,7 @@ export default function ContactPage() {
                       </label>
                       <Input
                         id="email"
+                        name="email"
                         type="email"
                         placeholder="john@example.com"
                         required
@@ -114,6 +127,7 @@ export default function ContactPage() {
                       </label>
                       <Input
                         id="phone"
+                        name="phone"
                         placeholder="+91 98765 43210"
                         className="border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"
                       />
@@ -122,18 +136,20 @@ export default function ContactPage() {
                       <label htmlFor="interest" className="mb-2 block text-sm font-medium text-gray-300">
                         I'm interested in
                       </label>
-                      <Select>
-                        <SelectTrigger className="border-gray-700 bg-gray-800/50 text-white">
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="starter">Starter Plan</SelectItem>
-                          <SelectItem value="pro">Pro Plan</SelectItem>
-                          <SelectItem value="enterprise">Enterprise Plan</SelectItem>
-                          <SelectItem value="demo">Product Demo</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <select
+                        name="interest"
+                        required
+                        className="w-full border-gray-700 bg-gray-800/50 text-white px-4 py-2 rounded"
+                      >
+                        <option value="">Select an option</option>
+                        <option value="starter">Starter Plan</option>
+                        <option value="pro">Pro Plan</option>
+                        <option value="enterprise">Enterprise Plan</option>
+                        <option value="demo">Product Demo</option>
+                        <option value="other">Other</option>
+                      </select>
+                      
+                      <input type="hidden" name="interest" value={selectedInterest} />
                     </div>
                     <div className="mb-6">
                       <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-300">
@@ -141,6 +157,7 @@ export default function ContactPage() {
                       </label>
                       <Textarea
                         id="message"
+                        name="message"
                         placeholder="Tell us about your needs..."
                         required
                         className="min-h-[120px] border-gray-700 bg-gray-800/50 text-white placeholder:text-gray-500"

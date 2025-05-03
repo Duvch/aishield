@@ -33,7 +33,7 @@ const plans = [
     id: "demo",
     name: "Demo",
     price: "Free",
-    description: "Try AI Cover with limited features",
+    description: "Try AI Shield with limited features",
     features: ["5 scans per month", "2 takedown requests", "Basic platforms only", "Email support"],
     limitations: ["No AI Bot automation", "Limited scan types", "No priority scanning"],
   },

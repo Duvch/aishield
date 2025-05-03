@@ -9,10 +9,10 @@ export function Footer() {
           <div>
             <div className="flex items-center space-x-2">
               <Shield className="h-6 w-6 text-indigo-500" />
-              <span className="text-lg font-bold text-white">AI Cover</span>
+              <span className="text-lg font-bold text-white">AI Shield</span>
             </div>
             <p className="mt-4 text-sm text-gray-400">
-              Built to Protect What You Create. AI Cover offers comprehensive protection for your digital identity and
+              Built to Protect What You Create. AI Shield offers comprehensive protection for your digital identity and
               content.
             </p>
             <div className="mt-6 flex space-x-4">
@@ -66,40 +66,9 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/privacy-policy" className="text-sm text-gray-300 hover:text-indigo-400">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-sm text-gray-300 hover:text-indigo-400">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="/cookie-policy" className="text-sm text-gray-300 hover:text-indigo-400">
-                  Cookie Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/dmca-policy" className="text-sm text-gray-300 hover:text-indigo-400">
-                  DMCA Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
+          
 
-          <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Contact</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-indigo-400" />
-                <span className="text-sm text-gray-300">contact@aicover.ai</span>
-              </li>
-            </ul>
+          <div> 
             <div className="mt-6 rounded-lg border border-gray-800 bg-gray-900/50 p-4">
               <h4 className="mb-2 text-sm font-medium text-white">Subscribe to our newsletter</h4>
               <form className="flex space-x-2">
@@ -120,7 +89,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 border-t border-gray-800 pt-8 text-center">
-          <p className="text-sm text-gray-400">&copy; {new Date().getFullYear()} AI Cover. All rights reserved.</p>
+          <p className="text-sm text-gray-400">&copy; {new Date().getFullYear()} AI Shield. All rights reserved.</p>
         </div>
       </div>
     </footer>
